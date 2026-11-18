@@ -1,6 +1,8 @@
-# MR - Material de Construção • API REST Comercial
-
+# MR - Material de Construção • API REST Comercial 
 > *"Um jeito fácil de construir barato"*
+
+
+# PROJETO OPEN SOURCE TECINFO 2026
 
 API REST didática, modular e profissional desenvolvida com **Node.js**, **Express**, **TypeScript**, **JWT**, **CORS** e **Swagger UI**.  
 Toda a modelagem de entidades, DTOs e endpoints foi desenvolvida estritamente com **nomenclaturas em Português (PT-BR)** para corresponder perfeitamente às telas do sistema comercial (React + Vite).

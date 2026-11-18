@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.git
+*.tar.gz
+*.log
+deploy.ps1

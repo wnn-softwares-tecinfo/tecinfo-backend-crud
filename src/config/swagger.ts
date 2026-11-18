@@ -14,6 +14,10 @@ export const swaggerDocument: OpenAPIV3.Document = {
   },
   servers: [
     {
+      url: 'https://winnicius.com/tecinfo/labs/api-mr-construcao/server',
+      description: 'Servidor de Produção (VPS Hostinger)',
+    },
+    {
       url: 'http://localhost:3000',
       description: 'Servidor Local de Desenvolvimento',
     },
