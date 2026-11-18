@@ -29,7 +29,7 @@ async function main() {
     update: {},
     create: {
       id: 'user-vend-01',
-      nome: 'Carlos Eduardo (Vendedor)',
+      nome: 'Usuário Padrão (Vendedor)',
       email: 'vendedor@mrconstrucao.com.br',
       senha: senhaPadraoHash,
       cargo: CargoUsuario.VENDEDOR,
@@ -37,7 +37,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Usuários injetados:', {
+  console.log('Usuários injetados:', {
     admin: usuarioAdmin.email,
     vendedor: usuarioVendedor.email,
   });
@@ -76,7 +76,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Clientes injetados com sucesso.');
+  console.log('Clientes injetados com sucesso.');
 
   // 3. Injeção de Produtos (Correspondência exata com o design das telas)
   const produtoCimento = await prisma.produto.upsert({
