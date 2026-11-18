@@ -1,4 +1,5 @@
 import express from 'express';
+import 'express-async-errors';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerDocument } from './config/swagger';

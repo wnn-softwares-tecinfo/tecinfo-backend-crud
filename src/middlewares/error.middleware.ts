@@ -7,8 +7,9 @@ export function errorMiddleware(
   res: Response,
   _next: NextFunction
 ): void {
-  if (error instanceof AppError) {
-    res.status(error.statusCode).json({
+  if (error instanceof AppError || (error && typeof (error as any).statusCode === 'number')) {
+    const statusCode = (error as any).statusCode || 400;
+    res.status(statusCode).json({
       status: 'error',
       message: error.message,
     });
