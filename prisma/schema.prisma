@@ -1,0 +1,128 @@
+// Prisma Schema para MR - Material de Construção
+// Modelagem de dados 100% alinhada com as telas do front-end e em Português (PT-BR)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CargoUsuario {
+  ADMIN
+  VENDEDOR
+}
+
+enum FormaPagamento {
+  A_VISTA
+  PARCELADO
+  COM_DESCONTO
+}
+
+enum StatusOrcamento {
+  PENDENTE
+  APROVADO
+  CANCELADO
+}
+
+model Usuario {
+  id         String       @id @default(uuid())
+  nome       String
+  email      String       @unique
+  senha      String
+  cargo      CargoUsuario @default(VENDEDOR)
+  ativo      Boolean      @default(true)
+  criadoEm   DateTime     @default(now())
+  atualizadoEm DateTime   @updatedAt
+
+  orcamentos Orcamento[]
+
+  @@map("usuarios")
+}
+
+model Cliente {
+  id              String      @id @default(uuid())
+  nomeCliente     String      @map("nome_cliente")
+  telefone        String
+  rua             String
+  numero          String
+  complemento     String?
+  bairro          String
+  cidade          String
+  cep             String
+  pontoReferencia String?     @map("ponto_referencia")
+  criadoEm        DateTime    @default(now()) @map("criado_em")
+  atualizadoEm    DateTime    @updatedAt @map("atualizado_em")
+
+  orcamentos      Orcamento[]
+
+  @@map("clientes")
+}
+
+model Produto {
+  id             String          @id @default(uuid())
+  codigoBarras   String          @unique @map("codigo_barras")
+  codigo         String          @unique // Ex: "00085", "00194", "02939"
+  nomeProduto    String          @map("nome_produto")
+  marca          String
+  familia        String          // Elétrico, Hidráulico, Alvenaria, Pintura, Ferramentas...
+  fornecedor     String
+  custo          Decimal         @db.Decimal(10, 2)
+  promocional    Boolean         @default(false)
+  precoVenda     Decimal         @db.Decimal(10, 2) @map("preco_venda")
+  descontoAvista Decimal         @default(0) @db.Decimal(10, 2) @map("desconto_a_vista")
+  precoPrazo     Decimal         @db.Decimal(10, 2) @map("preco_prazo")
+  taxaLucro      Decimal         @db.Decimal(5, 2) @map("taxa_lucro") // % slider 0-100
+  estoqueMinimo  Int             @default(5) @map("estoque_minimo")
+  estoqueAtual   Int             @default(0) @map("estoque_atual")
+  unidade        String          // Litro, Quilo, Caixa, Metro, Cartela, Par, Saco, Unidade...
+  validade       DateTime?
+  garantia       String?         // Ex: "12 meses"
+  criadoEm       DateTime        @default(now()) @map("criado_em")
+  atualizadoEm   DateTime        @updatedAt @map("atualizado_em")
+
+  itensOrcamento ItemOrcamento[]
+
+  @@map("produtos")
+}
+
+model Orcamento {
+  id                 String          @id @default(uuid())
+  numeroOrcamento    String          @unique @map("numero_orcamento") // Ex: "00124"
+  vendedorId         String          @map("vendedor_id")
+  vendedorNome       String          @map("vendedor_nome")
+  clienteId          String          @map("cliente_id")
+  clienteNome        String          @map("cliente_nome")
+  formaPagamento     FormaPagamento  @default(A_VISTA) @map("forma_pagamento")
+  numeroParcelas     Int?            @map("numero_parcelas") // Ex: 3 (1x a 10x)
+  percentualDesconto Decimal?        @db.Decimal(5, 2) @map("percentual_desconto")
+  observacoes        String?         @db.Text
+  valorTotal         Decimal         @db.Decimal(10, 2) @map("valor_total")
+  status             StatusOrcamento @default(PENDENTE)
+  criadoEm           DateTime        @default(now()) @map("criado_em")
+  atualizadoEm       DateTime        @updatedAt @map("atualizado_em")
+
+  vendedor           Usuario         @relation(fields: [vendedorId], references: [id])
+  cliente            Cliente         @relation(fields: [clienteId], references: [id])
+  itens              ItemOrcamento[]
+
+  @@map("orcamentos")
+}
+
+model ItemOrcamento {
+  id            String    @id @default(uuid())
+  orcamentoId   String    @map("orcamento_id")
+  produtoId     String    @map("produto_id")
+  codigoProduto String    @map("codigo_produto") // Ex: "00085"
+  nomeProduto   String    @map("nome_produto")
+  quantidade    Int
+  valorUnitario Decimal   @db.Decimal(10, 2) @map("valor_unitario")
+  subtotal      Decimal   @db.Decimal(10, 2)
+
+  orcamento     Orcamento @relation(fields: [orcamentoId], references: [id], onDelete: Cascade)
+  produto       Produto   @relation(fields: [produtoId], references: [id])
+
+  @@map("itens_orcamento")
+}
