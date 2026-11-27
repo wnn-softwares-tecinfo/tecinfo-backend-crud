@@ -1,30 +1,11 @@
-# MR - Material de Construção • API REST Comercial 
-> *"Um jeito fácil de construir barato"*
-
-
 # PROJETO OPEN SOURCE TECINFO 2026
+# Referencia Técnica - PSI
 
 API REST didática, modular e profissional desenvolvida com **Node.js**, **Express**, **TypeScript**, **JWT**, **CORS** e **Swagger UI**.  
 Toda a modelagem de entidades, DTOs e endpoints foi desenvolvida estritamente com **nomenclaturas em Português (PT-BR)** para corresponder perfeitamente às telas do sistema comercial (React + Vite).
 
----
-
-## Correspondência com as Telas de Design
-
-| Tela de Referência | Endpoint Principal | Modelo / DTO |
-| :--- | :--- | :--- |
-| **1. Imprimir Orçamento** | `GET /api/orcamentos/:id/imprimir` | `RespostaImpressaoOrcamentoDTO` (Cabeçalho, Vendedor, Orçamento nº, Data/Hora, Tabela com Código/Nome/Qtd/Unit/Subtotal, Total R$ 466,00, Forma de Pagamento e Observações) |
-| **2. Criar / Cadastrar Orçamento** | `POST /api/orcamentos` | `CriarOrcamentoDTO` (`vendedorId`, `clienteId`, `formaPagamento`, `itens`, `observacoes`) |
-| **3. Cadastro de Produto** | `POST /api/produtos` / `GET /api/produtos` | `Produto` (`codigoBarras`, `nomeProduto`, `marca`, `familia`, `fornecedor`, `custo`, `promocional`, `precoVenda`, `descontoAvista`, `precoPrazo`, `taxaLucro`, `estoqueMinimo`, `unidade`, `validade`, `garantia`) |
-| **4. Cadastro de Cliente** | `POST /api/clientes` / `GET /api/clientes` | `Cliente` (`nomeCliente`, `telefone`, `rua`, `numero`, `complemento`, `bairro`, `cidade`, `cep`, `pontoReferencia`) |
-
----
 
 ## Como Executar o Projeto
-
-### Pré-requisitos
-- Node.js 18+ (testado no Node.js 22 LTS)
-- npm ou yarn
 
 ### 1. Instalar as dependências
 ```bash
@@ -35,7 +16,6 @@ npm install
 ```bash
 npm run dev
 ```
-> O servidor iniciará por padrão na porta **3000** (ou na definida no seu `.env`).
 
 ### 3. Compilar e rodar em Produção
 ```bash
@@ -44,6 +24,24 @@ npm start
 ```
 
 ---
+## 🗄️ Criação do Banco de Dados e Injeção de Dados (Prisma ORM)
+
+### 1. Comandos para Subir o Banco e Injetar os Dados:
+
+```bash
+# 1. Subir o container PostgreSQL em segundo plano (via Docker Compose)
+docker compose up -d
+
+# 2. Gerar o Prisma Client tipado e sincronizar o esquema
+npm run prisma:generate
+npx prisma db push
+
+# 3. Executar a Injeção de Dados (Seed) no Banco de Dados
+npm run prisma:seed
+
+# 4. (Opcional) Abrir a interface visual do Prisma Studio
+npm run prisma:studio
+```
 
 ## Documentação Swagger Interativa
 
@@ -51,6 +49,19 @@ Com o servidor rodando, acesse no navegador:
 **[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**
 
 No Swagger UI você pode testar todos os endpoints, autenticar via botão **Authorize** usando o Bearer Token, e visualizar o contrato completo dos DTOs e respostas.
+
+
+### 2. Onde fica a Modelagem do Banco?
+- Arquivo: [`prisma/schema.prisma`](file:///c:/Users/wnn-dev/winnicius-projects/wnn-softwares/wnn-root/tecinfo-tasks/back-end-mr-construcao/prisma/schema.prisma)
+- Contém todas as tabelas (`usuarios`, `clientes`, `produtos`, `orcamentos`, `itens_orcamento`), enums e relacionamentos em PT-BR.
+
+### 3. Onde fica o Script de Injeção de Dados (Seed)?
+- Arquivo: [`prisma/seed.ts`](file:///c:/Users/wnn-dev/winnicius-projects/wnn-softwares/wnn-root/tecinfo-tasks/back-end-mr-construcao/prisma/seed.ts)
+- Utiliza o Prisma Client para injetar via `upsert`:
+  - Usuários (Admin e Vendedor com senhas criptografadas em bcrypt);
+  - Clientes (João da Silva com endereço completo no Bessa);
+  - Produtos (Cimento CP II, Rejunte Quartzolit, Areia Grossa, Tijolo, Tubo PVC com códigos, margens de lucro e preços);
+  - Orçamento nº **00124** de **R$ 466,00**.
 
 ---
 
@@ -77,7 +88,7 @@ Após rodar o seed do Prisma (`npm run prisma:seed`), o banco de dados estará p
 
 ---
 
-## 🏛️ Arquitetura em Camadas Simplificada
+## Arquitetura em Camadas Simplificada
 
 ```
 src/
@@ -94,36 +105,16 @@ src/
 ├── app.ts           # Configuração do Express, CORS e Swagger
 └── server.ts        # Bootstrap e inicialização do servidor HTTP
 ```
-
 ---
 
-## 🗄️ Criação do Banco de Dados e Injeção de Dados (Prisma ORM)
+## Correspondência com as Telas de Design
 
-### 1. Onde fica a Modelagem do Banco?
-- Arquivo: [`prisma/schema.prisma`](file:///c:/Users/wnn-dev/winnicius-projects/wnn-softwares/wnn-root/tecinfo-tasks/back-end-mr-construcao/prisma/schema.prisma)
-- Contém todas as tabelas (`usuarios`, `clientes`, `produtos`, `orcamentos`, `itens_orcamento`), enums e relacionamentos em PT-BR.
+| Tela de Referência | Endpoint Principal | Modelo / DTO |
+| :--- | :--- | :--- |
+| **1. Imprimir Orçamento** | `GET /api/orcamentos/:id/imprimir` | `RespostaImpressaoOrcamentoDTO` (Cabeçalho, Vendedor, Orçamento nº, Data/Hora, Tabela com Código/Nome/Qtd/Unit/Subtotal, Total R$ 466,00, Forma de Pagamento e Observações) |
+| **2. Criar / Cadastrar Orçamento** | `POST /api/orcamentos` | `CriarOrcamentoDTO` (`vendedorId`, `clienteId`, `formaPagamento`, `itens`, `observacoes`) |
+| **3. Cadastro de Produto** | `POST /api/produtos` / `GET /api/produtos` | `Produto` (`codigoBarras`, `nomeProduto`, `marca`, `familia`, `fornecedor`, `custo`, `promocional`, `precoVenda`, `descontoAvista`, `precoPrazo`, `taxaLucro`, `estoqueMinimo`, `unidade`, `validade`, `garantia`) |
+| **4. Cadastro de Cliente** | `POST /api/clientes` / `GET /api/clientes` | `Cliente` (`nomeCliente`, `telefone`, `rua`, `numero`, `complemento`, `bairro`, `cidade`, `cep`, `pontoReferencia`) |
+---
 
-### 2. Onde fica o Script de Injeção de Dados (Seed)?
-- Arquivo: [`prisma/seed.ts`](file:///c:/Users/wnn-dev/winnicius-projects/wnn-softwares/wnn-root/tecinfo-tasks/back-end-mr-construcao/prisma/seed.ts)
-- Utiliza o Prisma Client para injetar via `upsert`:
-  - Usuários (Admin e Vendedor com senhas criptografadas em bcrypt);
-  - Clientes (João da Silva com endereço completo no Bessa);
-  - Produtos (Cimento CP II, Rejunte Quartzolit, Areia Grossa, Tijolo, Tubo PVC com códigos, margens de lucro e preços);
-  - Orçamento nº **00124** de **R$ 466,00** (idêntico ao mockup da imagem).
-
-### 3. Comandos para Subir o Banco e Injetar os Dados:
-
-```bash
-# 1. Subir o container PostgreSQL em segundo plano (via Docker Compose)
-docker compose up -d
-
-# 2. Gerar o Prisma Client tipado e sincronizar o esquema
-npm run prisma:generate
-npx prisma db push
-
-# 3. Executar a Injeção de Dados (Seed) no Banco de Dados
-npm run prisma:seed
-
-# 4. (Opcional) Abrir a interface visual do Prisma Studio
-npm run prisma:studio
-```
+## Projeto para Referencia Técnica - PSI
